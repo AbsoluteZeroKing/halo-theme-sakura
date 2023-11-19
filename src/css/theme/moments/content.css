@@ -80,8 +80,6 @@
 
             & > p {
               overflow: unset;
-              word-wrap: break-word;
-              word-break: break-all;
             }
 
             & .comment-box {
@@ -146,7 +144,7 @@
       border-radius: 12px;
       outline: none;
       cursor: pointer;
-      transition: all 0.5s ease 0s;
+      transition: box-shadow 0.5s ease 0s;
 
       &:hover {
         background-color: #f0ffff;
@@ -154,7 +152,8 @@
       }
 
       &.loading {
-        padding: 25px;
+        background-color: unset;
+        border: none;
       }
     }
   }

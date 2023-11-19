@@ -21,6 +21,15 @@ spec:
             - value: no_cursor
               label: 无样式
         - $formkit: radio
+          name: site_title
+          label: 站点标题
+          value: logo
+          options:
+            - value: logo
+              label: 优先使用站点Logo
+            - value: text
+              label: 仅使用站点标题文本
+        - $formkit: radio
           name: top_search
           label: 搜索功能
           value: true
@@ -135,7 +144,6 @@ spec:
           name: glitch_text
           id: glitch_text
           key: glitch_text
-          if: "$get(focus_tou).value == 'glitch-text'"
           label: 聚焦故障文本
           value: Hi,Friend
           help: 移动端：将显示在导航栏中，桌面端：该文本只有头部样式开启故障文字才能显示
@@ -505,12 +513,6 @@ spec:
               name: code
               label: 打赏二维码
               validation: "required"
-        - $formkit: attachment
-          name: alipay_code
-          label: 支付宝打赏
-        - $formkit: attachment
-          name: wechat_code
-          label: 微信打赏
         - $formkit: radio
           name: code_line
           label: 开启代码行号
@@ -554,6 +556,7 @@ spec:
         - $formkit: radio
           name: category_radar
           label: 开启分类雷达
+          help: 需要大于等于 3 个分类时才会显示
           value: true
           options:
             - value: true

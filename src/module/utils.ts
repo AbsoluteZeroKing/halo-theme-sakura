@@ -62,33 +62,6 @@ export class Utils {
       subMenuElement.style.left = `${subMenuLeft}px`;
     });
   }
-
-  /**
-   * 注入评论样式
-   *
-   * TODO 自定义评论之前，暂时使用这种方式注入样式
-   */
-  @documentFunction()
-  public injectCommentStyle() {
-    // moments 页面不需要注入
-    if (sakura.getPageConfig("_templateId") === "moments") {
-      return;
-    }
-    const commentElement = document.querySelector(".comment") as HTMLElement;
-    if (!commentElement) {
-      return;
-    }
-    commentElement.querySelectorAll("div").forEach(async (divElement) => {
-      if (divElement.shadowRoot) {
-        const commentShadowElement = divElement.shadowRoot;
-        import("../css/injection/comment.css?inline").then((module) => {
-          const styleSheet = new CSSStyleSheet();
-          styleSheet.replaceSync(module.default);
-          commentShadowElement.adoptedStyleSheets = [styleSheet];
-        });
-      }
-    });
-  }
   
   /**
    * TODO 重试评论注册，临时解决 PJAX 情况下评论组件注册失败的问题
@@ -117,13 +90,12 @@ export class Utils {
       if (!commentAttrId) {
         return;
       }
-      const matchArr = commentAttrId.match(/comment-(.+)-(.+)-(.+)/);
-      if (!matchArr) {
+      const group = commentElement.getAttribute("group") || "";
+      const kind = commentElement.getAttribute("kind") || "";
+      const name = commentElement.getAttribute("name") || "";
+      if (!group || !kind || !name) {
         return;
       }
-      const group = matchArr[1].replaceAll("-", ".");
-      const kind = matchArr[2];
-      const name = matchArr[3];
       Util.retry(() => registerCommentWidget(commentAttrId, group, kind, name));
     });
     const registerCommentWidget = (id: string, group: string, kind: string, name: string): Promise<string> => {
@@ -141,8 +113,6 @@ export class Utils {
             colorScheme: 'light'
           }
         );
-        // 注入样式
-        this.injectCommentStyle();
         resolve("success");
       });
     }
@@ -170,8 +140,8 @@ export class Utils {
       .then((response) => response.json())
       .then((data) => {
         // @ts-ignore
-        import("APlayer").then(async (module) => {
-          await import("APlayer/dist/APlayer.min.css");
+        import("aplayer").then(async (module) => {
+          await import("aplayer/dist/APlayer.min.css");
           const APlayer = module.default;
           const aplayerElement = createFixedAPlayerElement();
           const flxedAplayerOptions = {
@@ -297,8 +267,8 @@ export class Utils {
         });
 
         let language = highlight.default.getLanguage(lang);
-        // 如果没有指定语言，则启用自动检测
-        if (!language || !language.aliases || language.aliases.length === 0) {
+        // 如果没有指定语言或者无法获取到语言，则启用自动检测
+        if (!language) {
           codeElement.classList.remove(`language-${lang}`);
           const autoLanguage = highlight.default.highlightAuto(codeElement.textContent || "");
           // 自定检测失败，则使用默认的 plain text
@@ -309,8 +279,6 @@ export class Utils {
           }
           // 重新为 highlightElement 设置语言
           codeElement.classList.add(`language-${lang}`);
-        } else {
-          lang = language.aliases[0];
         }
         codeElement.setAttribute("data-rel", lang.toUpperCase());
         codeElement.classList.add(lang.toLowerCase());
